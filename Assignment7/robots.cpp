@@ -120,10 +120,12 @@ public:
     bool   moveRobots();
     
 private:
+    void    updateRobotArray(int i);
     int     m_rows;
     int     m_cols;
     Player* m_player;
     Robot*  m_robots[MAXROBOTS];
+    int     m_robotCapacity;
     int     m_nRobots;
 };
 
@@ -194,14 +196,15 @@ bool Robot::getAttacked(int dir) //✓
     // it survived the damage).  Otherwise, do not move, but return true
     // (since the momentum from the blow would bump the robot against the
     // wall, dealing it additional fatal damage).
-    if(previously_hit)
+    if(previously_hit){
         return true;  // This implementation compiles, but is incorrect.
+    }
     if(!m_arena->determineNewPosition(m_row, m_col, dir)){//hit against the wall
         previously_hit = true;
         return true;
     }
     else
-        previously_hit = false;
+        previously_hit = true;
     return false;
 }
 
@@ -265,7 +268,6 @@ void Player::moveOrAttack(int dir) //✓
     m_arena->determineNewPosition(r, c, dir);
     if(m_arena->nRobotsAt(r, c) != 0){//we have robots
         m_arena->attackRobotAt(r, c, dir);
-        return;
     }
     else{
         m_arena->determineNewPosition(m_row, m_col, dir);
@@ -486,12 +488,20 @@ bool Arena::attackRobotAt(int r, int c, int dir) //✓
         Robot* rob = m_robots[i];
         if(rob->row() == r && rob->col() == c){
             if(rob->getAttacked(dir)){
-                delete rob;
+                updateRobotArray(i);
                 return true;
             }
         }
     }
     return false;
+}
+
+void Arena::updateRobotArray(int i){
+    delete m_robots[i];
+    for(int j = i; i < m_nRobots; i++){
+        m_robots[j] = m_robots[j+1];
+    }
+    m_nRobots--;
 }
 
 bool Arena::moveRobots() //✓
