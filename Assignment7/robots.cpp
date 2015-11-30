@@ -197,7 +197,7 @@ bool Robot::getAttacked(int dir) //✓
     // (since the momentum from the blow would bump the robot against the
     // wall, dealing it additional fatal damage).
     if(previously_hit){
-        return true;  // This implementation compiles, but is incorrect.
+        return true;
     }
     if(!m_arena->determineNewPosition(m_row, m_col, dir)){//hit against the wall
         previously_hit = true;
@@ -307,8 +307,9 @@ Arena::~Arena() //✓
 {
     // TODO:  Delete the player and all remaining dynamically allocated robots.
     delete m_player;
-    for(int i = 0; i < m_nRobots; i++)
+    for(int i = 0; i < m_nRobots; i++){
         delete m_robots[i];
+    }
 }
 
 int Arena::rows() const //✓
@@ -498,7 +499,8 @@ bool Arena::attackRobotAt(int r, int c, int dir) //✓
 
 void Arena::updateRobotArray(int i){
     delete m_robots[i];
-    for(int j = i; i < m_nRobots; i++){
+    m_robots[i] = NULL;
+    for(int j = i; j < m_nRobots-1; j++){
         m_robots[j] = m_robots[j+1];
     }
     m_nRobots--;
@@ -644,7 +646,7 @@ int main()
 {
     // Create a game
     // Use this instead to create a mini-game:   Game g(3, 4, 2);
-    Game g(3, 4, 2);
+    Game g(1, 2, 12);
     
     // Play the game
     g.play();
