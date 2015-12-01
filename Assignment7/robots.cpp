@@ -110,7 +110,7 @@ public:
     Player* player() const;
     int     robotCount() const;
     int     nRobotsAt(int r, int c) const;
-    bool    determineNewPosition(int& r, int& c, int dir);
+    bool    determineNewPosition(int& r, int& c, int dir) const;
     void    display() const;
     
     // Mutators
@@ -348,7 +348,7 @@ int Arena::nRobotsAt(int r, int c) const //✓
     return num_robots;
 }
 
-bool Arena::determineNewPosition(int& r, int& c, int dir)//✓
+bool Arena::determineNewPosition(int& r, int& c, int dir) const//✓
 {
     // TODO:  If a move from row r, column c, one step in direction dir
     // would go off the edge of the arena, leave r and c unchanged and
@@ -404,19 +404,18 @@ void Arena::display() const //✓
     //        If it's 2 though 8, set it to '2' through '8'.
     //        For 9 or more, set it to '9'.
     
-    for(int i = 0; i < m_nRobots; i++){
-        Robot* rob = m_robots[i];
-        char& chr = grid[rob->row()-1][rob->col()-1];
-        if(chr == '.')
-            chr = 'R';
-        else if(chr == 'R')
-            chr = '2';
-        else if(chr == '9')
-            continue;
-        else
-            chr++;
+    for(int i = 0; i < rows(); i++){
+        for(int j = 0; j < cols(); j++){
+            int count = nRobotsAt(i+1,j+1); //Due to the offsets
+            if (count == 1)
+                grid[i][j] = 'R';
+            else if (count > 1 && count < 9)
+                grid[i][j] = count + '0';
+            else if (count >= 9)
+                grid[i][j] = '9';
+        }
     }
-    
+        
     // Indicate player's position
     if (m_player != nullptr)
     {
@@ -646,7 +645,7 @@ int main()
 {
     // Create a game
     // Use this instead to create a mini-game:   Game g(3, 4, 2);
-    Game g(1, 2, 12);
+    Game g(7, 8, 25);
     
     // Play the game
     g.play();
